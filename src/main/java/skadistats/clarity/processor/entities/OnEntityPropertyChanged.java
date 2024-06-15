@@ -2,8 +2,10 @@ package skadistats.clarity.processor.entities;
 
 import skadistats.clarity.event.UsagePointMarker;
 import skadistats.clarity.event.UsagePointType;
+import skadistats.clarity.model.DTClass;
 import skadistats.clarity.model.Entity;
 import skadistats.clarity.model.FieldPath;
+import skadistats.clarity.util.Predicate;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,4 +18,5 @@ import java.lang.annotation.Target;
 public @interface OnEntityPropertyChanged {
     String classPattern() default ".*";
     String propertyPattern() default ".*";
+    Class<? extends Predicate<DTClass>> classMatcher() default ClassMatcher.class;
 }
