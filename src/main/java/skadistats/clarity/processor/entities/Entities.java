@@ -143,10 +143,10 @@ public class Entities {
         Predicate<Object[]> predicate = null;
 
         if (!isDefaultClassPredicate) {
-            final var classMatcherInstance = classPredicate.getDeclaredConstructor().newInstance();
+            final var classPredicateInstance = classPredicate.getDeclaredConstructor().newInstance();
             predicate = value -> {
                 var e = (Entity) value[0];
-                return classMatcherInstance.apply(e.getDtClass());
+                return classPredicateInstance.apply(e.getDtClass());
             };
         }
 
