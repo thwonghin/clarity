@@ -18,5 +18,5 @@ import java.lang.annotation.Target;
 public @interface OnEntityPropertyChanged {
     String classPattern() default ".*";
     String propertyPattern() default ".*";
-    Class<? extends Predicate<DTClass>> classMatcher() default ClassMatcher.class;
+    Class<? extends Predicate<DTClass>> classPredicate() default MatchAllPredicate.class;
 }

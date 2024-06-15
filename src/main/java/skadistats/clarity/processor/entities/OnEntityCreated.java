@@ -16,5 +16,5 @@ import java.lang.annotation.Target;
 @UsagePointMarker(value = UsagePointType.EVENT_LISTENER, parameterClasses = { Entity.class })
 public @interface OnEntityCreated {
     String classPattern() default ".*";
-    Class<? extends Predicate<DTClass>> classMatcher() default ClassMatcher.class;
+    Class<? extends Predicate<DTClass>> classPredicate() default MatchAllPredicate.class;
 }

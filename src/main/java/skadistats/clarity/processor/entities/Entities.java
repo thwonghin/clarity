@@ -41,7 +41,6 @@ import skadistats.clarity.wire.shared.common.proto.CommonNetworkBaseTypes;
 import skadistats.clarity.wire.shared.demo.proto.Demo;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -106,52 +105,60 @@ public class Entities {
 
     @Initializer(OnEntityCreated.class)
     public void initOnEntityCreated(final EventListener<OnEntityCreated> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
     @Initializer(OnEntityDeleted.class)
     public void initOnEntityDeleted(final EventListener<OnEntityDeleted> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
     @Initializer(OnEntityUpdated.class)
     public void initOnEntityUpdated(final EventListener<OnEntityUpdated> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
     @Initializer(OnEntityPropertyCountChanged.class)
     public void initPropertyCountChanged(final EventListener<OnEntityPropertyCountChanged> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
     @Initializer(OnEntityEntered.class)
     public void initOnEntityEntered(final EventListener<OnEntityEntered> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
     @Initializer(OnEntityLeft.class)
     public void initOnEntityLeft(final EventListener<OnEntityLeft> listener) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classMatcher(), listener.getAnnotation().classPattern()));
+        listener.setInvocationPredicate(getInvocationPredicate(listener.getAnnotation().classPredicate(), listener.getAnnotation().classPattern()));
     }
 
-    private Predicate<Object[]> getInvocationPredicate(Class<? extends Predicate<DTClass>> classMatcher, String classPattern) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        if (classMatcher == ClassMatcher.class) {
-            if (classPattern.equals(".*")) {
-                return null;
-            } else {
-                final var p = Pattern.compile(classPattern);
-                return value -> {
-                    var e = (Entity) value[0];
-                    return p.matcher(e.getDtClass().getDtName()).matches();
-                };
-            }
+    private Predicate<Object[]> getInvocationPredicate(Class<? extends Predicate<DTClass>> classPredicate, String classPattern) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        var isDefaultClassPredicate = classPredicate == MatchAllPredicate.class;
+        var isDefaultClassPattern = classPattern.equals(".*");
+        if (isDefaultClassPredicate && isDefaultClassPattern) {
+            return null;
         }
 
-        final var classMatcherInstance = classMatcher.getDeclaredConstructor().newInstance();
-        return value -> {
-            var e = (Entity) value[0];
-            return classMatcherInstance.apply(e.getDtClass());
-        };
+        Predicate<Object[]> predicate = null;
+
+        if (!isDefaultClassPredicate) {
+            final var classMatcherInstance = classPredicate.getDeclaredConstructor().newInstance();
+            predicate = value -> {
+                var e = (Entity) value[0];
+                return classMatcherInstance.apply(e.getDtClass());
+            };
+        }
+
+        if (!isDefaultClassPattern) {
+            final var p = Pattern.compile(classPattern);
+            predicate =  value -> {
+                var e = (Entity) value[0];
+                return p.matcher(e.getDtClass().getDtName()).matches();
+            };
+        }
+
+        return predicate;
     }
 
     @OnInit
