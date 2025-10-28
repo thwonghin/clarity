@@ -1,5 +1,20 @@
 # Clarity 2 Changelog
 
+## October 29, 2025: Version 3.1.2 released
+
+* fix #345: new type VectoWS
+
+## September 21, 2024: Version 3.1.1 released
+
+* fix #321: cleanup baselines when entity is deleted
+* remove SimulationTimeDecoder, as it depends on ticks/second, and return uint32 instead
+
+## September 14, 2024: Version 3.1.0 released
+
+* add support for Deadlock
+* update protobufs
+* properly support HeroID_t type
+
 ## July 10, 2024: Version 3.0.6 released
 
 * CS2 stopped sending deletions as well

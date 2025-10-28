@@ -1,5 +1,6 @@
 package skadistats.clarity.processor.sendtables;
 
+import skadistats.clarity.io.s2.FieldType;
 import skadistats.clarity.io.s2.SerializerId;
 import skadistats.clarity.model.EngineId;
 import skadistats.clarity.model.GameVersionRange;
@@ -14,11 +15,13 @@ public class FieldGeneratorPatches {
 
     private static final Map<GameVersionRange, PatchFunc> PATCHES_DOTA_S2 = new LinkedHashMap<>();
     private static final Map<GameVersionRange, PatchFunc> PATCHES_CSGO_S2 = new LinkedHashMap<>();
+    private static final Map<GameVersionRange, PatchFunc> PATCHES_DEADLOCK = new LinkedHashMap<>();
 
     static List<PatchFunc> getPatches(EngineId engineId, int gameVersion) {
         return switch (engineId) {
             case DOTA_S2 -> filterPatches(PATCHES_DOTA_S2, gameVersion);
             case CSGO_S2 -> filterPatches(PATCHES_CSGO_S2, gameVersion);
+            case DEADLOCK -> filterPatches(PATCHES_DEADLOCK, gameVersion);
             default -> Collections.emptyList();
         };
     }
@@ -47,6 +50,9 @@ public class FieldGeneratorPatches {
             FieldGeneratorPatches::patchS2SimulationTime);
 
         PATCHES_CSGO_S2.put(new GameVersionRange(null, null),
+            FieldGeneratorPatches::patchS2SimulationTime);
+
+        PATCHES_DEADLOCK.put(new GameVersionRange(null, null),
             FieldGeneratorPatches::patchS2SimulationTime);
     }
 
@@ -136,7 +142,7 @@ public class FieldGeneratorPatches {
         switch (field.name) {
             case "m_flSimulationTime":
             case "m_flAnimTime":
-                field.decoderProperties.encoderType = "simulationtime";
+                field.fieldType = FieldType.forString("uint32");
         }
     }
 

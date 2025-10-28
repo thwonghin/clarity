@@ -476,7 +476,6 @@ public class Entities {
             baselineRegistry.updateEntityBaseline(
                     message.getBaseline(),
                     eIdx,
-                    dtClass.getClassId(),
                     newState.copy()
             );
         }
@@ -502,7 +501,6 @@ public class Entities {
             baselineRegistry.updateEntityBaseline(
                     message.getBaseline(),
                     eIdx,
-                    dtClass.getClassId(),
                     newState.copy()
             );
         }
@@ -559,6 +557,7 @@ public class Entities {
         assert entity.isExistent();
         entity.setExistent(false);
         entities.removeEntity(entity);
+        baselineRegistry.clearEntity(entity.getIndex());
         logModification("DELETE", entity);
         emitDeletedEvent(entity);
     }
@@ -613,7 +612,7 @@ public class Entities {
     private EntityState getBaseline(int clsId, int baseline, int entityIdx, boolean delta) {
         EntityState s;
         if (delta) {
-            s = baselineRegistry.getEntityBaselineState(entityIdx, baseline, clsId);
+            s = baselineRegistry.getEntityBaselineState(entityIdx, baseline);
             if (s != null) {
                 return s;
             }
